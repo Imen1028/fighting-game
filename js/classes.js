@@ -1,11 +1,12 @@
 // Definition of sprite: A sprite is a two-dimensional (2D) graphical object used in computer graphics, particularly in video games.
 
 class Sprite {
-    constructor({position, imageSrc, scale = 1, framesMax = 1}) {
+    constructor({position, imageSrc, scale = 1, framesMax = 1, offset = {x:0, y:0}}) {
         this.position = position  
         this.image = new Image() // The new Image() is the same as document.createElement("img")
         this.image.src = imageSrc
         this.scale = scale
+        this.offset = offset
         this.framesMax = framesMax
         this.framesCurrent = 0
         this.framesElapsed = 0
@@ -19,15 +20,14 @@ class Sprite {
             0, // the starting y position of the crop 
             this.image.width / this.framesMax, // the width of the crop 
             this.image.height, // the height of the crop 
-            this.position.x, 
-            this.position.y, 
+            this.position.x - this.offset.x, 
+            this.position.y - this.offset.y, 
             (this.image.width / this.framesMax) * this.scale, 
             this.image.height * this.scale
             )
         }
-
-    update() {
-        this.draw()
+    
+    animateFrames() {
         // The following two lines are for making the image animation move slower (Move every 10 frames)
         this.framesElapsed++
         if(this.framesElapsed % this.framesHold === 0) {
@@ -39,11 +39,34 @@ class Sprite {
             }
         }
     }
+
+    update() {
+        this.draw()
+        this.animateFrames()
+    }
 }
 
-class Fighter {
-    constructor({position, velocity, color, height, width, direction, offset}) {
-        this.position = position
+class Fighter extends Sprite {
+    constructor({
+        position, 
+        velocity, 
+        color, 
+        height, 
+        width, 
+        direction, 
+        offset = {x: 0, y: 0}, 
+        imageSrc, 
+        scale = 1, 
+        framesMax = 1,
+        sprites
+    }) {
+        super({
+            position,
+            imageSrc,
+            scale,
+            framesMax,
+            offset
+        })
         this.velocity = velocity
         this.width = width
         this.height = height // Height is the distance from top to bottom of the object
@@ -52,17 +75,30 @@ class Fighter {
                 x: this.position.x,
                 y: this.position.y     
             },
-            offset,
+            attackOffset: {
+                x: 0,
+                y: 0
+            },
             width: 100,
             height: 50
         }
+        this.offset 
         this.onTheGround
         this.color = color
         this.isAttacking = false
         this.attackCooldown = false
         this.direction = direction
         this.health = 100
-        
+        this.framesCurrent = 0
+        this.framesElapsed = 0
+        this.framesHold = 8
+        this.sprites = sprites
+
+        for (const sprite in sprites) {
+            sprites[sprite].image = new Image()
+            sprites[sprite].image.src = sprites[sprite].imageSrc
+        }
+        console.log(this.sprites)
         // this.isAttacked = false // I think I would only need it when create multiple characters 
 
             // this.rangeAttackBox = {
@@ -79,37 +115,48 @@ class Fighter {
         }, 200)
     }
 
-    draw() {
-        c.fillStyle = this.color
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    // draw() {
 
-        // Attack
-        // QuestionS: 
-        // 寫在這裡會造成同時只有一個腳色能攻擊
-        // AttackBox can't perfectly follow to movement of the character 
 
-        if(this.attackCooldown === false) {
-            if(this.isAttacking && this.direction === 'right') { // only drow the attack while we are attacking 
-            c.fillStyle = 'gray'
-            c.fillRect(this.attackBox.position.x, this.attackBox.position.y + 25, this.attackBox.width, this.attackBox.height)
-            this.resetAttackCooldown()
-            console.log(this.attackCooldown)
-            } else if (this.isAttacking && this.direction === 'left') {
-                this.attackBox.offset.x = 50
-                c.fillStyle = 'gray'
-                c.fillRect(this.attackBox.position.x - this.attackBox.offset.x , this.attackBox.position.y + 25, this.attackBox.width, this.attackBox.height)
-                this.resetAttackCooldown()
-                console.log(this.attackCooldown)
-            }
+    //     // c.fillStyle = this.color
+    //     // c.fillRect(this.position.x, this.position.y, this.width, this.height)
 
-        //     //Range Attack
-        //         // c.fillStyle = 'yellow'
-        //         // c.fillRect(this.rangeAttackBox.position.x, this.rangeAttackBox.position.y, this.rangeAttackBox.width, this.rangeAttackBox.height)
-            }
-        }
+    //     // Attack
+    //     // QuestionS: 
+    //     // 寫在這裡會造成同時只有一個腳色能攻擊
+    //     // AttackBox can't perfectly follow to movement of the character 
+
+    //     if(this.attackCooldown === false) {
+    //         if(this.isAttacking && this.direction === 'right') { // only drow the attack while we are attacking 
+    //         c.fillStyle = 'gray'
+    //         c.fillRect(this.attackBox.position.x, 
+    //             this.attackBox.position.y + 25, 
+    //             this.attackBox.width, 
+    //             this.attackBox.height
+    //             )
+    //         this.resetAttackCooldown()
+    //         } else if (this.isAttacking && this.direction === 'left') {
+    //             this.attackBox.offset.x = 50
+    //             c.fillStyle = 'gray'
+    //             c.fillRect(this.attackBox.position.x - this.attackBox.offset.x , 
+    //                 this.attackBox.position.y + 25, 
+    //                 this.attackBox.width, 
+    //                 this.attackBox.height
+    //                 )
+    //             this.resetAttackCooldown()
+    //         }
+
+    //     //     //Range Attack
+    //     //         // c.fillStyle = 'yellow'
+    //     //         // c.fillRect(this.rangeAttackBox.position.x, this.rangeAttackBox.position.y, this.rangeAttackBox.width, this.rangeAttackBox.height)
+    //         }
+    //     }
+
+
 
     update() {
         this.draw()
+        this.animateFrames()
 
         this.attackBox.position.x = this.position.x
         this.attackBox.position.y = this.position.y
@@ -131,10 +178,86 @@ class Fighter {
     }
 
     attack() {
-        this.isAttacking = true
-        setTimeout(() => {
-            this.isAttacking = false }, 100)
+        // this.isAttacking = true
+        // setTimeout(() => {
+        //     this.isAttacking = false }, 100)
+            if(this.attackCooldown === false) {
+                if(this.direction === 'right') { // only drow the attack while we are attacking 
+                c.fillStyle = 'gray'
+                c.fillRect(this.attackBox.position.x, 
+                    this.attackBox.position.y + 25, 
+                    this.attackBox.width, 
+                    this.attackBox.height
+                    )
+                this.resetAttackCooldown()
+                this.isAttacking = true
+                // console.log("hii")
+                } else if (this.direction === 'left') {
+                    this.attackBox.attackOffset.x = 50
+                    c.fillStyle = 'gray'
+                    c.fillRect(this.attackBox.position.x - this.attackBox.attackOffset.x , 
+                        this.attackBox.position.y + 25, 
+                        this.attackBox.width, 
+                        this.attackBox.height
+                        )
+                    this.resetAttackCooldown()
+                    this.isAttacking = true
+                }
+         }
     }
+
+playerMove() {
+        this.framesCurrent = 0
+        if (keys.a.pressed && this.lastKey === 'a' && this.position.x >= 0) {
+            this.direction = 'left'
+            this.velocity.x = -5
+            this.framesMax = this.sprites.run.framesMax
+            this.image = this.sprites.run.image
+            console.log(this.framesMax)
+        } else if (keys.d.pressed && this.lastKey === 'd' && this.position.x + this.width <= canvas.width) {
+            this.direction = 'right'
+            this.velocity.x = 5
+            this.framesMax = this.sprites.run.framesMax
+            this.image = this.sprites.run.image
+        } else if (keys.a.pressed && this.position.x >= 0) { 
+            this.direction = 'left'
+            this.velocity.x = -5
+            this.framesMax = this.sprites.run.framesMax
+            this.image = this.sprites.run.image
+        } else if (keys.d.pressed && this.position.x + this.width <= canvas.width) {
+            this.direction = 'right'
+            this.velocity.x = 5
+            this.framesMax = this.sprites.run.framesMax
+            this.image = this.sprites.run.image
+        }
+    }
+
+move() {
+    this.framesCurrent = 0
+    if (keys.ArrowLeft.pressed && this.lastKey === 'ArrowLeft' && this.position.x >= 0) {
+        this.direction = 'left'
+        this.velocity.x = -5
+        this.framesMax = this.sprites.run.framesMax
+        this.image = this.sprites.run.image
+        console.log(this.framesMax)
+    } else if (keys.ArrowRight.pressed && this.lastKey === 'ArrowRight' && this.position.x + this.width <= canvas.width) {
+        this.direction = 'right'
+        this.velocity.x = 5
+        this.framesMax = this.sprites.run.framesMax
+        this.image = this.sprites.run.image
+    } else if (keys.ArrowLeft.pressed && this.position.x >= 0) { 
+        this.direction = 'left'
+        this.velocity.x = -5
+        this.framesMax = this.sprites.run.framesMax
+        this.image = this.sprites.run.image
+    } else if (keys.ArrowRight.pressed && this.position.x + this.width <= canvas.width) {
+        this.direction = 'right'
+        this.velocity.x = 5
+        this.framesMax = this.sprites.run.framesMax
+        this.image = this.sprites.run.image
+    }
+}
+
 }
 
 // class Sprite {

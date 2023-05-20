@@ -10,7 +10,7 @@ function rectangularCollision({rectangular1, rectangular2}) {
              rectangular2.position.y + rectangular2.height &&
              rectangular1.direction === 'right'
          ) || (
-             rectangular1.attackBox.position.x - rectangular1.attackBox.offset.x <= // Left position of Player's attack box is small to the right position of enemy's position
+             rectangular1.attackBox.position.x - rectangular1.attackBox.attackOffset.x <= // Left position of Player's attack box is small to the right position of enemy's position
              rectangular2.position.x + rectangular2.width && 
              rectangular1.attackBox.position.x + rectangular1.attackBox.width >= // right edge of player's position is greater than the right edge of enemy's position
              rectangular2.position.x + rectangular2.width && 
