@@ -118,13 +118,13 @@ class Fighter extends Sprite {
     // draw() {
 
 
-    //     // c.fillStyle = this.color
-    //     // c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    // //     // c.fillStyle = this.color
+    // //     // c.fillRect(this.position.x, this.position.y, this.width, this.height)
 
-    //     // Attack
-    //     // QuestionS: 
-    //     // 寫在這裡會造成同時只有一個腳色能攻擊
-    //     // AttackBox can't perfectly follow to movement of the character 
+    // //     // Attack
+    // //     // QuestionS: 
+    // //     // 寫在這裡會造成同時只有一個腳色能攻擊
+    // //     // AttackBox can't perfectly follow to movement of the character 
 
     //     if(this.attackCooldown === false) {
     //         if(this.isAttacking && this.direction === 'right') { // only drow the attack while we are attacking 
@@ -146,9 +146,9 @@ class Fighter extends Sprite {
     //             this.resetAttackCooldown()
     //         }
 
-    //     //     //Range Attack
-    //     //         // c.fillStyle = 'yellow'
-    //     //         // c.fillRect(this.rangeAttackBox.position.x, this.rangeAttackBox.position.y, this.rangeAttackBox.width, this.rangeAttackBox.height)
+    // //     //     //Range Attack
+    // //     //         // c.fillStyle = 'yellow'
+    // //     //         // c.fillRect(this.rangeAttackBox.position.x, this.rangeAttackBox.position.y, this.rangeAttackBox.width, this.rangeAttackBox.height)
     //         }
     //     }
 
@@ -174,89 +174,35 @@ class Fighter extends Sprite {
             this.velocity.y += gravity
             this.onTheGround = false
         }
-        
-    }
 
-    attack() {
-        // this.isAttacking = true
-        // setTimeout(() => {
-        //     this.isAttacking = false }, 100)
-            if(this.attackCooldown === false) {
-                if(this.direction === 'right') { // only drow the attack while we are attacking 
+        if(this.attackCooldown === false) {
+            if(this.isAttacking && this.direction === 'right') { // only drow the attack while we are attacking 
+            c.fillStyle = 'gray'
+            c.fillRect(this.attackBox.position.x, 
+                this.attackBox.position.y + 25, 
+                this.attackBox.width, 
+                this.attackBox.height
+                )
+            this.resetAttackCooldown()
+            } else if (this.isAttacking && this.direction === 'left') {
+                this.attackBox.attackOffset.x = 50
                 c.fillStyle = 'gray'
-                c.fillRect(this.attackBox.position.x, 
+                c.fillRect(this.attackBox.position.x - this.attackBox.attackOffset.x , 
                     this.attackBox.position.y + 25, 
                     this.attackBox.width, 
                     this.attackBox.height
                     )
                 this.resetAttackCooldown()
-                this.isAttacking = true
-                // console.log("hii")
-                } else if (this.direction === 'left') {
-                    this.attackBox.attackOffset.x = 50
-                    c.fillStyle = 'gray'
-                    c.fillRect(this.attackBox.position.x - this.attackBox.attackOffset.x , 
-                        this.attackBox.position.y + 25, 
-                        this.attackBox.width, 
-                        this.attackBox.height
-                        )
-                    this.resetAttackCooldown()
-                    this.isAttacking = true
-                }
-         }
-    }
-
-playerMove() {
-        this.framesCurrent = 0
-        if (keys.a.pressed && this.lastKey === 'a' && this.position.x >= 0) {
-            this.direction = 'left'
-            this.velocity.x = -5
-            this.framesMax = this.sprites.run.framesMax
-            this.image = this.sprites.run.image
-            console.log(this.framesMax)
-        } else if (keys.d.pressed && this.lastKey === 'd' && this.position.x + this.width <= canvas.width) {
-            this.direction = 'right'
-            this.velocity.x = 5
-            this.framesMax = this.sprites.run.framesMax
-            this.image = this.sprites.run.image
-        } else if (keys.a.pressed && this.position.x >= 0) { 
-            this.direction = 'left'
-            this.velocity.x = -5
-            this.framesMax = this.sprites.run.framesMax
-            this.image = this.sprites.run.image
-        } else if (keys.d.pressed && this.position.x + this.width <= canvas.width) {
-            this.direction = 'right'
-            this.velocity.x = 5
-            this.framesMax = this.sprites.run.framesMax
-            this.image = this.sprites.run.image
+            }
+        
         }
     }
 
-move() {
-    this.framesCurrent = 0
-    if (keys.ArrowLeft.pressed && this.lastKey === 'ArrowLeft' && this.position.x >= 0) {
-        this.direction = 'left'
-        this.velocity.x = -5
-        this.framesMax = this.sprites.run.framesMax
-        this.image = this.sprites.run.image
-        console.log(this.framesMax)
-    } else if (keys.ArrowRight.pressed && this.lastKey === 'ArrowRight' && this.position.x + this.width <= canvas.width) {
-        this.direction = 'right'
-        this.velocity.x = 5
-        this.framesMax = this.sprites.run.framesMax
-        this.image = this.sprites.run.image
-    } else if (keys.ArrowLeft.pressed && this.position.x >= 0) { 
-        this.direction = 'left'
-        this.velocity.x = -5
-        this.framesMax = this.sprites.run.framesMax
-        this.image = this.sprites.run.image
-    } else if (keys.ArrowRight.pressed && this.position.x + this.width <= canvas.width) {
-        this.direction = 'right'
-        this.velocity.x = 5
-        this.framesMax = this.sprites.run.framesMax
-        this.image = this.sprites.run.image
-    }
-}
+    attack() {
+        this.isAttacking = true
+        setTimeout(() => {
+            this.isAttacking = false }, 100)
+    }  
 
 }
 

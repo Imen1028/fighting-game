@@ -12,8 +12,11 @@
 // range attack
 // Make two characters can attack at the same time
 // health bar and timer - done
-// Attack will not stop if it does hit the other character
-// Transition between images with different frames  
+
+// Bugs:
+// Attack will not stop if it doesn't hit the other character
+// Transition between images with different frames - The solution is in the video, from 2:44:00 section Jump. Use switch to only trigger the image and frame change once!
+// The attack has a bug and The attack cooldown makes the attack inactive
 
 const canvas = document.querySelector('canvas');
 // Context is responsible for drawing our shape 
@@ -80,6 +83,10 @@ const player = new Fighter({
         run: {
             framesMax: 8,
             imageSrc: './img/Player/ERun.png'
+        },
+        jump: {
+            framesMax: 2,
+            imageSrc: './img/Player/EJump.png'
         }
     }
 })
@@ -153,26 +160,25 @@ function animate() {
     player.velocity.x = 0 // reset the movement
 
         player.image = player.sprites.idle.image
-        player.playerMove()
 
-        // if (keys.a.pressed && player.lastKey === 'a' && player.position.x >= 0) {
-        //     // player.image = player.sprites.run.imageSrc
-        //     player.direction = 'left'
-        //     player.velocity.x = -5
-        //     player.image = player.sprites.run.image
-        // } else if (keys.d.pressed && player.lastKey === 'd' && player.position.x + player.width <= canvas.width) {
-        //     player.direction = 'right'
-        //     player.velocity.x = 5
-        //     player.image = player.sprites.run.image
-        // } else if (keys.a.pressed && player.position.x >= 0) { // if a is not pressed last but still being pressed while other key is not pressed
-        //     player.direction = 'left'
-        //     player.velocity.x = -5
-        //     player.image = player.sprites.run.image
-        // } else if (keys.d.pressed && player.position.x + player.width < canvas.width) {
-        //     player.direction = 'right'
-        //     player.velocity.x = 5
-        //     player.image = player.sprites.run.image
-        // }    
+        if (keys.a.pressed && player.lastKey === 'a' && player.position.x >= 0) {
+            // player.image = player.sprites.run.imageSrc
+            player.direction = 'left'
+            player.velocity.x = -5
+            player.image = player.sprites.run.image
+        } else if (keys.d.pressed && player.lastKey === 'd' && player.position.x + player.width <= canvas.width) {
+            player.direction = 'right'
+            player.velocity.x = 5
+            player.image = player.sprites.run.image
+        } else if (keys.a.pressed && player.position.x >= 0) { // if a is not pressed last but still being pressed while other key is not pressed
+            player.direction = 'left'
+            player.velocity.x = -5
+            player.image = player.sprites.run.image
+        } else if (keys.d.pressed && player.position.x + player.width < canvas.width) {
+            player.direction = 'right'
+            player.velocity.x = 5
+            player.image = player.sprites.run.image
+        }    
 
     // Jump movement
         // Player
@@ -190,35 +196,34 @@ function animate() {
 
         enemy.framesMax = enemy.sprites.idle.framesMax
         enemy.image = enemy.sprites.idle.image
-        enemy.move()
 
-        // if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft' && enemy.position.x >= 0) {
-        //     enemy.direction = 'left'
-        //     enemy.velocity.x = -5
-        //     enemy.framesMax = enemy.sprites.run.framesMax
-        //     enemy.image = enemy.sprites.run.image
-        //     console.log(enemy.framesMax)
-        // } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight' && enemy.position.x + enemy.width <= canvas.width) {
-        //     enemy.direction = 'right'
-        //     enemy.velocity.x = 5
-        //     enemy.framesMax = enemy.sprites.run.framesMax
-        //     enemy.image = enemy.sprites.run.image
-        // } else if (keys.ArrowLeft.pressed && enemy.position.x >= 0) { 
-        //     enemy.direction = 'left'
-        //     enemy.velocity.x = -5
-        //     enemy.framesMax = enemy.sprites.run.framesMax
-        //     enemy.image = enemy.sprites.run.image
-        // } else if (keys.ArrowRight.pressed && enemy.position.x + enemy.width <= canvas.width) {
-        //     enemy.direction = 'right'
-        //     enemy.velocity.x = 5
-        //     enemy.framesMax = enemy.sprites.run.framesMax
-        //     enemy.image = enemy.sprites.run.image
-        // }
+        if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft' && enemy.position.x >= 0) {
+            enemy.direction = 'left'
+            enemy.velocity.x = -5
+            enemy.framesMax = enemy.sprites.run.framesMax
+            enemy.image = enemy.sprites.run.image
+            console.log(enemy.framesMax)
+        } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight' && enemy.position.x + enemy.width <= canvas.width) {
+            enemy.direction = 'right'
+            enemy.velocity.x = 5
+            enemy.framesMax = enemy.sprites.run.framesMax
+            enemy.image = enemy.sprites.run.image
+        } else if (keys.ArrowLeft.pressed && enemy.position.x >= 0) { 
+            enemy.direction = 'left'
+            enemy.velocity.x = -5
+            enemy.framesMax = enemy.sprites.run.framesMax
+            enemy.image = enemy.sprites.run.image
+        } else if (keys.ArrowRight.pressed && enemy.position.x + enemy.width <= canvas.width) {
+            enemy.direction = 'right'
+            enemy.velocity.x = 5
+            enemy.framesMax = enemy.sprites.run.framesMax
+            enemy.image = enemy.sprites.run.image
+        }
 
     // Detect for collision
     if (!gameover) {
         if (rectangularCollision({rectangular1: player, rectangular2: enemy})
-            && player.isAttacking && player.attackCooldown === false && enemy.health >= 0 // Enemy is attacked
+            && player.isAttacking && enemy.health >= 0 // Enemy is attacked
             ) {
             player.isAttacking = false // Reset isAttacking
             console.log("You are attacking")
@@ -239,7 +244,7 @@ function animate() {
         }
 
         if (rectangularCollision({rectangular1: enemy, rectangular2: player})
-            && enemy.isAttacking && enemy.attackCooldown === false && player.health >= 0 // player is attacked 
+            && enemy.isAttacking && player.health >= 0 // player is attacked 
             ) {
         enemy.isAttacking = false // Reset isAttacking
         console.log("Enemy is attacking")
