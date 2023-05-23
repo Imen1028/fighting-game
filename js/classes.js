@@ -58,7 +58,8 @@ class Fighter extends Sprite {
         imageSrc, 
         scale = 1, 
         framesMax = 1,
-        sprites
+        sprites,
+        attackBox= { offset: {}, width: undifined, height: undefined} 
     }) {
         super({
             position,
@@ -72,16 +73,13 @@ class Fighter extends Sprite {
         this.height = height // Height is the distance from top to bottom of the object
         this.attackBox = {
             position: {
-                x: this.position.x,
-                y: this.position.y     
+              x: this.position.x,
+              y: this.position.y
             },
-            attackOffset: {
-                x: 0,
-                y: 0
-            },
-            width: 100,
-            height: 50
-        }
+            offset: attackBox.offset,
+            width: attackBox.width,
+            height: attackBox.height
+          }
         this.offset 
         this.onTheGround
         this.color = color
@@ -169,40 +167,95 @@ class Fighter extends Sprite {
         if (this.position.y + this.height + this.velocity.y 
             >= canvas.height - 94 ) { // To make the character to stop falling at 94 px height (94px above from the grounda)
             this.velocity.y = 0
+            this.position.y = 332
             this.onTheGround = true
         } else {
             this.velocity.y += gravity
             this.onTheGround = false
         }
 
-        if(this.attackCooldown === false) {
-            if(this.isAttacking && this.direction === 'right') { // only drow the attack while we are attacking 
-            c.fillStyle = 'gray'
-            c.fillRect(this.attackBox.position.x, 
-                this.attackBox.position.y + 25, 
-                this.attackBox.width, 
-                this.attackBox.height
-                )
-            this.resetAttackCooldown()
-            } else if (this.isAttacking && this.direction === 'left') {
-                this.attackBox.attackOffset.x = 50
-                c.fillStyle = 'gray'
-                c.fillRect(this.attackBox.position.x - this.attackBox.attackOffset.x , 
-                    this.attackBox.position.y + 25, 
-                    this.attackBox.width, 
-                    this.attackBox.height
-                    )
-                this.resetAttackCooldown()
-            }
+        // Attack
+        // c.fillRect(
+        //     this.attackBox.position.x + this.attackBox.offset.x, 
+        //     this.attackBox.position.y + this.attackBox.offset.y, 
+        //     this.attackBox.width, 
+        //     this.attackBox.height
+        //     )
+
+        // if(this.attackCooldown === false) {
+        //     if(this.isAttacking && this.direction === 'right') { // only drow the attack while we are attacking 
+        //     c.fillStyle = 'gray'
+        //     c.fillRect(this.attackBox.position.x, 
+        //         this.attackBox.position.y + 25, 
+        //         this.attackBox.width, 
+        //         this.attackBox.height
+        //         )
+        //     this.resetAttackCooldown()
+        //     } else if (this.isAttacking && this.direction === 'left') {
+        //         this.attackBox.attackOffset.x = 50
+        //         c.fillStyle = 'gray'
+        //         c.fillRect(this.attackBox.position.x - this.attackBox.attackOffset.x , 
+        //             this.attackBox.position.y + 25, 
+        //             this.attackBox.width, 
+        //             this.attackBox.height
+        //             )
+        //         this.resetAttackCooldown()
+        //     }
         
-        }
+        // }
     }
 
     attack() {
+        this.switchSprites('attack1')
         this.isAttacking = true
-        setTimeout(() => {
-            this.isAttacking = false }, 100)
     }  
+
+    switchSprites(sprite) {
+        if (
+            this.image === this.sprites.attack1.image &&
+            this.framesCurrent < this.sprites.attack1.framesMax - 1
+            ){
+                return
+            }
+            
+        switch(sprite) {
+            case 'idle':
+            if(this.image !== this.sprites.idle.image) {
+                this.image = this.sprites.idle.image
+                this.framesMax = this.sprites.idle.framesMax
+                this.framesCurrent = 0
+            }
+            break
+            case 'run':
+                if(this.image !== this.sprites.run.image) {
+                    this.image = this.sprites.run.image
+                    this.framesMax = this.sprites.run.framesMax
+                    this.framesCurrent = 0
+                }
+            break
+            case 'jump':
+                if(this.image !== this.sprites.jump.image) {
+                    this.image = this.sprites.jump.image
+                    this.framesMax = this.sprites.jump.framesMax
+                    this.framesCurrent = 0
+                }
+            break
+            case 'fall':
+                if(this.image !== this.sprites.fall.image) {
+                    this.image = this.sprites.fall.image
+                    this.framesMax = this.sprites.fall.framesMax
+                    this.framesCurrent = 0
+                }
+            break 
+            case 'attack1':
+                if(this.image !== this.sprites.attack1.image) {
+                    this.image = this.sprites.attack1.image
+                    this.framesMax = this.sprites.attack1.framesMax
+                    this.framesCurrent = 0
+                }
+            break           
+        }
+    }
 
 }
 

@@ -12,6 +12,7 @@
 // range attack
 // Make two characters can attack at the same time
 // health bar and timer - done
+// Flip the image
 
 // Bugs:
 // Attack will not stop if it doesn't hit the other character
@@ -66,7 +67,7 @@ const player = new Fighter({
     },
     color: 'red',
     height: 150,
-    width: 50,
+    width: 75,
     direction: 'right',
     offset: {
         x: 150,
@@ -87,7 +88,23 @@ const player = new Fighter({
         jump: {
             framesMax: 2,
             imageSrc: './img/Player/EJump.png'
+        },
+        fall: {
+            framesMax: 2,
+            imageSrc: './img/Player/EFall.png'
+        },
+        attack1: {
+            framesMax: 6,
+            imageSrc: './img/Player/EAttack1.png'
         }
+    },
+    attackBox: {
+        offset: {
+            x: 80,
+            y: 50
+        },
+        width: 150,
+        height: 50
     }
 })
 
@@ -102,7 +119,7 @@ const enemy = new Fighter({
     },
     color: 'blue',
     height: 150,
-    width: 50,
+    width: 25,
     direction: 'left',
     offset: {
         x: 200,
@@ -119,7 +136,27 @@ const enemy = new Fighter({
         run: {
             framesMax: 8,
             imageSrc: './img/Enemy/Run.png'
+        },
+        jump: {
+            framesMax: 2,
+            imageSrc: './img/Enemy/Jump.png'
+        },
+        fall: {
+            framesMax: 2,
+            imageSrc: './img/Enemy/Fall.png'
+        },
+        attack1: {
+            framesMax: 4,
+            imageSrc: './img/Enemy/Attack1.png'
         }
+    },
+    attackBox: {
+        offset: {
+            x: -165,
+            y: 50
+        },
+        width: 150,
+        height: 50
     }
 })
 
@@ -156,76 +193,138 @@ function animate() {
     player.update()
     enemy.update()
 
+  // Attack Box  
+    // c.fillRect(
+    //     player.attackBox.position.x + player.attackBox.offset.x, 
+    //     player.attackBox.position.y + player.attackBox.offset.y, 
+    //     player.attackBox.width, 
+    //     player.attackBox.height
+    //     )
+
+    // position x
+    // c.fillStyle = 'red'
+    // c.fillRect (
+    //     enemy.position.x,
+    //     enemy.position.y,
+    //     5,
+    //     200   
+    //    )
+    //    c.fillRect (
+    //     player.position.x,
+    //     player.position.y,
+    //     5,
+    //     200   
+    //    )
+
+    // position x + width or - width   
+//     c.fillStyle = 'blue'
+//     c.fillRect (
+//          enemy.position.x - 25,
+//          enemy.position.y,
+//          5,
+//          200   
+//         )
+//    c.fillRect (
+//          player.position.x + 75,
+//          player.position.y,
+//          5,
+//          200   
+//         )
+        
     // Player movement
     player.velocity.x = 0 // reset the movement
-
-        player.image = player.sprites.idle.image
 
         if (keys.a.pressed && player.lastKey === 'a' && player.position.x >= 0) {
             // player.image = player.sprites.run.imageSrc
             player.direction = 'left'
             player.velocity.x = -5
-            player.image = player.sprites.run.image
+            player.switchSprites('run')
         } else if (keys.d.pressed && player.lastKey === 'd' && player.position.x + player.width <= canvas.width) {
             player.direction = 'right'
             player.velocity.x = 5
-            player.image = player.sprites.run.image
+            player.switchSprites('run')
         } else if (keys.a.pressed && player.position.x >= 0) { // if a is not pressed last but still being pressed while other key is not pressed
             player.direction = 'left'
             player.velocity.x = -5
-            player.image = player.sprites.run.image
+            player.switchSprites('run')
         } else if (keys.d.pressed && player.position.x + player.width < canvas.width) {
             player.direction = 'right'
             player.velocity.x = 5
-            player.image = player.sprites.run.image
-        }    
+            player.switchSprites('run')
+        } else {
+            player.switchSprites('idle')
+        }
 
     // Jump movement
         // Player
     if (keys.w.pressed && player.onTheGround) {
-        player.velocity.y = -15
-    } 
-    
-        //Enemy
-    if (keys.ArrowUp.pressed && enemy.onTheGround) {
-        enemy.velocity.y = -15
+        player.velocity.y = -12
     }
+
+    // Jump image
+    if (player.velocity.y < 0) {
+        player.switchSprites('jump')
+    } else if(player.velocity.y > 0) {
+        player.switchSprites('fall')
+    }
+
+
+    
+    //Enemy
 
     // Enemy movement
     enemy.velocity.x = 0
 
-        enemy.framesMax = enemy.sprites.idle.framesMax
-        enemy.image = enemy.sprites.idle.image
+    if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft' && enemy.position.x >= 0) {
+        // enemy.image = enemy.sprites.run.imageSrc
+        enemy.direction = 'left'
+        enemy.velocity.x = -5
+        enemy.switchSprites('run')
+    } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight' && enemy.position.x + enemy.width <= canvas.width) {
+        enemy.direction = 'right'
+        enemy.velocity.x = 5
+        enemy.switchSprites('run')
+    } else if (keys.ArrowLeft.pressed && enemy.position.x >= 0) { // if a is not pressed last but still being pressed while other key is not pressed
+        enemy.direction = 'left'
+        enemy.velocity.x = -5
+        enemy.switchSprites('run')
+    } else if (keys.ArrowRight.pressed && enemy.position.x + enemy.width < canvas.width) {
+        enemy.direction = 'right'
+        enemy.velocity.x = 5
+        enemy.switchSprites('run')
+    } else {
+        enemy.switchSprites('idle')
+    }
 
-        if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft' && enemy.position.x >= 0) {
-            enemy.direction = 'left'
-            enemy.velocity.x = -5
-            enemy.framesMax = enemy.sprites.run.framesMax
-            enemy.image = enemy.sprites.run.image
-            console.log(enemy.framesMax)
-        } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight' && enemy.position.x + enemy.width <= canvas.width) {
-            enemy.direction = 'right'
-            enemy.velocity.x = 5
-            enemy.framesMax = enemy.sprites.run.framesMax
-            enemy.image = enemy.sprites.run.image
-        } else if (keys.ArrowLeft.pressed && enemy.position.x >= 0) { 
-            enemy.direction = 'left'
-            enemy.velocity.x = -5
-            enemy.framesMax = enemy.sprites.run.framesMax
-            enemy.image = enemy.sprites.run.image
-        } else if (keys.ArrowRight.pressed && enemy.position.x + enemy.width <= canvas.width) {
-            enemy.direction = 'right'
-            enemy.velocity.x = 5
-            enemy.framesMax = enemy.sprites.run.framesMax
-            enemy.image = enemy.sprites.run.image
-        }
+    // Enemy jump
+    if (keys.ArrowUp.pressed && enemy.onTheGround) {
+        enemy.velocity.y = -12
+    }
+
+    // Jump image
+    if (enemy.velocity.y < 0) {
+        enemy.switchSprites('jump')
+    } else if(enemy.velocity.y > 0) {
+        enemy.switchSprites('fall')
+    }
 
     // Detect for collision
     if (!gameover) {
-        if (rectangularCollision({rectangular1: player, rectangular2: enemy})
-            && player.isAttacking && enemy.health >= 0 // Enemy is attacked
+        // if(player.isAttacking) {
+        //     console.log(rectangularCollision({rectangular1: player, rectangular2: enemy}))
+        //     || console.log(player.isAttacking)
+        //     || console.log(player.framesCurrent === 4)
+        //     || console.log(player.attackCooldown === false)
+        // }
+        if (
+            rectangularCollision({rectangular1: player, rectangular2: enemy}) && 
+            player.isAttacking && 
+            enemy.health >= 0 && 
+            player.framesCurrent === 4 && 
+            player.attackCooldown === false  // Enemy is attacked
             ) {
             player.isAttacking = false // Reset isAttacking
+            player.resetAttackCooldown()
             console.log("You are attacking")
             // console.log(`Damage: ${Math.floor(Math.random() * (100 - 50 + 1) + 50)}`)
             enemy.health -= 10
@@ -243,14 +342,25 @@ function animate() {
                 }
         }
 
+        if (player.framesCurrent === 4) {
+            player.isAttacking = false
+        }
+
         if (rectangularCollision({rectangular1: enemy, rectangular2: player})
-            && enemy.isAttacking && player.health >= 0 // player is attacked 
+            && enemy.isAttacking && 
+            player.health >= 0 &&
+            enemy.framesCurrent === 1 &&
+            enemy.attackCooldown === false// player is attacked 
             ) {
         enemy.isAttacking = false // Reset isAttacking
+        enemy.resetAttackCooldown()
         console.log("Enemy is attacking")
         // console.log(`Damage: ${Math.floor(Math.random() * (100 - 50 + 1) + 50)}`)
         
-        player.health -= 10
+        player.health -= 8
+        if (player.health < 0) {
+            player.health = 0
+        }
         document.querySelector('#playerHealth').style.width = `${player.health}%`
 
         // player.isAttacked = true // 暫時用不到
@@ -263,6 +373,10 @@ function animate() {
             if (player.onTheGround) {
                 player.velocity.y = -3 // 
             }
+        }
+
+        if (enemy.framesCurrent === 1) {
+            enemy.isAttacking = false
         }
 
         // end game based on health
