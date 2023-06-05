@@ -29,6 +29,7 @@ function rectangularCollision({rectangular1, rectangular2}) {
          displayText.innerHTML = 'Tie'
      } else if(player.health > enemy.health) {
          displayText.innerHTML = 'Player 1 Wins'
+         enemy.switchSprites('death')
      }  else if(enemy.health > player.health) {
          displayText.innerHTML = 'Player 2 Wins'
      }
@@ -54,4 +55,3 @@ function rectangularCollision({rectangular1, rectangular2}) {
          clearTimeout(timerId)
      }
  }
- 

@@ -13,6 +13,8 @@
 // Make two characters can attack at the same time
 // health bar and timer - done
 // Flip the image
+// Random danage - console.log(`Damage: ${Math.floor(Math.random() * (100 - 50 + 1) + 50)}`)
+
 
 // Bugs:
 // Attack will not stop if it doesn't hit the other character
@@ -96,6 +98,14 @@ const player = new Fighter({
         attack1: {
             framesMax: 6,
             imageSrc: './img/Player/EAttack1.png'
+        },
+        takeHit: {
+            framesMax: 4,
+            imageSrc: './img/Player/ETake Hit - white silhouette.png'
+        },
+        death: {
+            framesMax: 6,
+            imageSrc: './img/Player/EDeath.png'
         }
     },
     attackBox: {
@@ -148,6 +158,14 @@ const enemy = new Fighter({
         attack1: {
             framesMax: 4,
             imageSrc: './img/Enemy/Attack1.png'
+        },
+        takeHit: {
+            framesMax: 3,
+            imageSrc: './img/Enemy/Take hit.png'
+        },
+        death: {
+            framesMax: 7,
+            imageSrc: './img/Enemy/death.png'
         }
     },
     attackBox: {
@@ -202,40 +220,40 @@ function animate() {
     //     )
 
     // position x
-    // c.fillStyle = 'red'
-    // c.fillRect (
-    //     enemy.position.x,
-    //     enemy.position.y,
-    //     5,
-    //     200   
-    //    )
-    //    c.fillRect (
-    //     player.position.x,
-    //     player.position.y,
-    //     5,
-    //     200   
-    //    )
+    c.fillStyle = 'red'
+    c.fillRect (
+        enemy.position.x,
+        enemy.position.y,
+        5,
+        200   
+       )
+       c.fillRect (
+        player.position.x,
+        player.position.y,
+        5,
+        200   
+       )
 
     // position x + width or - width   
-//     c.fillStyle = 'blue'
-//     c.fillRect (
-//          enemy.position.x - 25,
-//          enemy.position.y,
-//          5,
-//          200   
-//         )
-//    c.fillRect (
-//          player.position.x + 75,
-//          player.position.y,
-//          5,
-//          200   
-//         )
+    c.fillStyle = 'blue'
+    c.fillRect (
+         enemy.position.x - 25,
+         enemy.position.y,
+         5,
+         200   
+        )
+   c.fillRect (
+         player.position.x + 75,
+         player.position.y,
+         5,
+         200   
+        )
         
     // Player movement
+    if(!player.dead) {
     player.velocity.x = 0 // reset the movement
 
         if (keys.a.pressed && player.lastKey === 'a' && player.position.x >= 0) {
-            // player.image = player.sprites.run.imageSrc
             player.direction = 'left'
             player.velocity.x = -5
             player.switchSprites('run')
@@ -267,28 +285,29 @@ function animate() {
     } else if(player.velocity.y > 0) {
         player.switchSprites('fall')
     }
-
+}
 
     
     //Enemy
 
     // Enemy movement
+    if(!enemy.dead){
     enemy.velocity.x = 0
 
-    if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft' && enemy.position.x >= 0) {
+    if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft' && enemy.position.x - enemy.width >= 0) {
         // enemy.image = enemy.sprites.run.imageSrc
         enemy.direction = 'left'
         enemy.velocity.x = -5
         enemy.switchSprites('run')
-    } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight' && enemy.position.x + enemy.width <= canvas.width) {
+    } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight' && enemy.position.x <= canvas.width) {
         enemy.direction = 'right'
         enemy.velocity.x = 5
         enemy.switchSprites('run')
-    } else if (keys.ArrowLeft.pressed && enemy.position.x >= 0) { // if a is not pressed last but still being pressed while other key is not pressed
+    } else if (keys.ArrowLeft.pressed && enemy.position.x - enemy.width >= 0) { // if a is not pressed last but still being pressed while other key is not pressed
         enemy.direction = 'left'
         enemy.velocity.x = -5
         enemy.switchSprites('run')
-    } else if (keys.ArrowRight.pressed && enemy.position.x + enemy.width < canvas.width) {
+    } else if (keys.ArrowRight.pressed && enemy.position.x <= canvas.width) {
         enemy.direction = 'right'
         enemy.velocity.x = 5
         enemy.switchSprites('run')
@@ -307,15 +326,20 @@ function animate() {
     } else if(enemy.velocity.y > 0) {
         enemy.switchSprites('fall')
     }
+}
 
     // Detect for collision
     if (!gameover) {
+
         // if(player.isAttacking) {
         //     console.log(rectangularCollision({rectangular1: player, rectangular2: enemy}))
         //     || console.log(player.isAttacking)
         //     || console.log(player.framesCurrent === 4)
         //     || console.log(player.attackCooldown === false)
         // }
+
+
+        // Player atack enemy
         if (
             rectangularCollision({rectangular1: player, rectangular2: enemy}) && 
             player.isAttacking && 
@@ -326,11 +350,17 @@ function animate() {
             player.isAttacking = false // Reset isAttacking
             player.resetAttackCooldown()
             console.log("You are attacking")
-            // console.log(`Damage: ${Math.floor(Math.random() * (100 - 50 + 1) + 50)}`)
-            enemy.health -= 10
+
+            enemy.takeHit()
+            // enemy.switchSprites('takeHit')
+            // enemy.health -= 10
             document.querySelector('#enemyHealth').style.width = `${enemy.health}%`
 
-            // enemy.isAttacked = true // 暫時用不到
+            // determine if the enemy is dead
+            if (enemy.health <= 0) {
+                enemy.health = 0
+            }
+
             if(player.direction === 'left' && enemy.position.x >= 0) { // Knockback (擊退)
                 enemy.velocity.x = -15
                 } else if(player.direction === 'right' && enemy.position.x + enemy.width < canvas.width) {
@@ -346,6 +376,8 @@ function animate() {
             player.isAttacking = false
         }
 
+
+        // Enemy attack player
         if (rectangularCollision({rectangular1: enemy, rectangular2: player})
             && enemy.isAttacking && 
             player.health >= 0 &&
@@ -356,9 +388,12 @@ function animate() {
         enemy.resetAttackCooldown()
         console.log("Enemy is attacking")
         // console.log(`Damage: ${Math.floor(Math.random() * (100 - 50 + 1) + 50)}`)
-        
-        player.health -= 8
-        if (player.health < 0) {
+        player.takeHit()
+        // player.switchSprites('takeHit')
+        // player.health -= 5
+
+        // Determine the player is dead
+        if (player.health <= 0) {
             player.health = 0
         }
         document.querySelector('#playerHealth').style.width = `${player.health}%`
