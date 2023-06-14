@@ -60,8 +60,8 @@ const shop = new Sprite ({
 
 const player = new Fighter({
     position: {
-        x:0,
-        y:0 // position y is the height of the object, and higher its position y is, lower its position is
+        x: 0,
+        y: canvas.height - 94 // position y is the height of the object, and higher its position y is, lower its position is
     },
     velocity: {
         x: 0,
@@ -121,7 +121,7 @@ const player = new Fighter({
 const enemy = new Fighter({
     position:  {
         x: canvas.width - 40,
-        y:100
+        y: canvas.height - 94
     },
     velocity: {
         x: 0,
@@ -208,6 +208,8 @@ function animate() {
     c.fillRect(0, 0, canvas.width, canvas.height)
     background.update()
     shop.update()
+    c.fillStyle = 'rgba(255, 255, 255, 0.1)'
+    c.fillRect(0, 0, canvas.width, canvas.height)
     player.update()
     enemy.update()
 
@@ -220,37 +222,36 @@ function animate() {
     //     )
 
     // position x
-    c.fillStyle = 'red'
-    c.fillRect (
-        enemy.position.x,
-        enemy.position.y,
-        5,
-        200   
-       )
-       c.fillRect (
-        player.position.x,
-        player.position.y,
-        5,
-        200   
-       )
+    // c.fillStyle = 'red'
+    // c.fillRect (
+    //     enemy.position.x,
+    //     enemy.position.y,
+    //     5,
+    //     200   
+    //    )
+    //    c.fillRect (
+    //     player.position.x,
+    //     player.position.y,
+    //     5,
+    //     200   
+    //    )
 
     // position x + width or - width   
-    c.fillStyle = 'blue'
-    c.fillRect (
-         enemy.position.x - 25,
-         enemy.position.y,
-         5,
-         200   
-        )
-   c.fillRect (
-         player.position.x + 75,
-         player.position.y,
-         5,
-         200   
-        )
+//     c.fillStyle = 'blue'
+//     c.fillRect (
+//          enemy.position.x - 25,
+//          enemy.position.y,
+//          5,
+//          200   
+//         )
+//    c.fillRect (
+//          player.position.x + 75,
+//          player.position.y,
+//          5,
+//          200   
+//         )
         
     // Player movement
-    if(!player.dead) {
     player.velocity.x = 0 // reset the movement
 
         if (keys.a.pressed && player.lastKey === 'a' && player.position.x >= 0) {
@@ -285,17 +286,14 @@ function animate() {
     } else if(player.velocity.y > 0) {
         player.switchSprites('fall')
     }
-}
 
     
     //Enemy
 
     // Enemy movement
-    if(!enemy.dead){
     enemy.velocity.x = 0
 
     if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft' && enemy.position.x - enemy.width >= 0) {
-        // enemy.image = enemy.sprites.run.imageSrc
         enemy.direction = 'left'
         enemy.velocity.x = -5
         enemy.switchSprites('run')
@@ -326,7 +324,6 @@ function animate() {
     } else if(enemy.velocity.y > 0) {
         enemy.switchSprites('fall')
     }
-}
 
     // Detect for collision
     if (!gameover) {
@@ -352,12 +349,12 @@ function animate() {
             console.log("You are attacking")
 
             enemy.takeHit()
-            // enemy.switchSprites('takeHit')
-            // enemy.health -= 10
-            document.querySelector('#enemyHealth').style.width = `${enemy.health}%`
+            gsap.to('#enemyHealth', {
+                width: enemy.health + '%'
+            })
 
             // determine if the enemy is dead
-            if (enemy.health <= 0) {
+            if (enemy.health < 0) {
                 enemy.health = 0
             }
 
@@ -387,18 +384,11 @@ function animate() {
         enemy.isAttacking = false // Reset isAttacking
         enemy.resetAttackCooldown()
         console.log("Enemy is attacking")
-        // console.log(`Damage: ${Math.floor(Math.random() * (100 - 50 + 1) + 50)}`)
         player.takeHit()
-        // player.switchSprites('takeHit')
-        // player.health -= 5
+        gsap.to('#playerHealth', {
+            width: player.health + '%'
+        })
 
-        // Determine the player is dead
-        if (player.health <= 0) {
-            player.health = 0
-        }
-        document.querySelector('#playerHealth').style.width = `${player.health}%`
-
-        // player.isAttacked = true // 暫時用不到
         if(enemy.direction === 'left' && player.position.x >= 0) { // Knockback
             player.velocity.x = -15
             } else if(enemy.direction === 'right' && player.position.x + player.width < canvas.width) {
@@ -426,6 +416,7 @@ animate()
 // The keydown event is fired when a key is pressed
 window.addEventListener('keydown', (event) => {
     // console.log(event)
+    if(player.health > 0){
     switch (event.key) {
         case 'a':
         keys.a.pressed = true
@@ -442,7 +433,11 @@ window.addEventListener('keydown', (event) => {
         case 's': 
         player.attack()
         break
+        }
+    }
 
+    if(enemy.health > 0) {    
+    switch (event.key) {
         case 'ArrowLeft':
         keys.ArrowLeft.pressed = true
         enemy.lastKey = 'ArrowLeft'
@@ -459,6 +454,7 @@ window.addEventListener('keydown', (event) => {
         case 'ArrowDown':
         enemy.attack()
         break
+        }
     }
 })
 

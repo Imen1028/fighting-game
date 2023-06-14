@@ -98,13 +98,6 @@ class Fighter extends Sprite {
             sprites[sprite].image.src = sprites[sprite].imageSrc
         }
         console.log(this.sprites)
-        // this.isAttacked = false // I think I would only need it when create multiple characters 
-
-            // this.rangeAttackBox = {
-            //     position: this.position,
-            //     width: 25,
-            //     height: 25
-            // }
     }
 
     resetAttackCooldown() {
@@ -118,49 +111,12 @@ class Fighter extends Sprite {
         this.health -= 10
         if(this.health <= 0) {
             this.switchSprites('death')
+            console.log("I'm dead!")
         } else {
             this.switchSprites('takeHit')
+            console.log("Don't hit me!")
         }
     }
-
-    // draw() {
-
-
-    // //     // c.fillStyle = this.color
-    // //     // c.fillRect(this.position.x, this.position.y, this.width, this.height)
-
-    // //     // Attack
-    // //     // QuestionS: 
-    // //     // 寫在這裡會造成同時只有一個腳色能攻擊
-    // //     // AttackBox can't perfectly follow to movement of the character 
-
-    //     if(this.attackCooldown === false) {
-    //         if(this.isAttacking && this.direction === 'right') { // only drow the attack while we are attacking 
-    //         c.fillStyle = 'gray'
-    //         c.fillRect(this.attackBox.position.x, 
-    //             this.attackBox.position.y + 25, 
-    //             this.attackBox.width, 
-    //             this.attackBox.height
-    //             )
-    //         this.resetAttackCooldown()
-    //         } else if (this.isAttacking && this.direction === 'left') {
-    //             this.attackBox.offset.x = 50
-    //             c.fillStyle = 'gray'
-    //             c.fillRect(this.attackBox.position.x - this.attackBox.offset.x , 
-    //                 this.attackBox.position.y + 25, 
-    //                 this.attackBox.width, 
-    //                 this.attackBox.height
-    //                 )
-    //             this.resetAttackCooldown()
-    //         }
-
-    // //     //     //Range Attack
-    // //     //         // c.fillStyle = 'yellow'
-    // //     //         // c.fillRect(this.rangeAttackBox.position.x, this.rangeAttackBox.position.y, this.rangeAttackBox.width, this.rangeAttackBox.height)
-    //         }
-    //     }
-
-
 
     update() {
         this.draw()
@@ -229,6 +185,17 @@ class Fighter extends Sprite {
             return
         }
 
+        switch(sprite) {
+            case 'death':
+                if(this.image !== this.sprites.death.image) 
+                {
+                    this.image= this.sprites.death.image
+                    this.framesMax = this.sprites.death.framesMax
+                    this.framesCurrent = 0
+                }
+            break
+        }
+
         if (
             this.image === this.sprites.attack1.image &&
             this.framesCurrent < this.sprites.attack1.framesMax - 1
@@ -286,15 +253,6 @@ class Fighter extends Sprite {
                     this.framesCurrent = 0
                 }
             break        
-            case 'death':
-                if(this.image !== this.sprites.death.image) 
-                {
-                    this.image= this.sprites.death.image
-                    this.framesMax = this.sprites.death.framesMax
-                    this.framesCurrent = 0
-                    console.log("hi I'm dead!")
-                }
-            break
         }
     }
 }
