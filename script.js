@@ -221,22 +221,22 @@ function animate() {
     //     player.attackBox.height
     //     )
 
-    // position x
-    // c.fillStyle = 'red'
-    // c.fillRect (
-    //     enemy.position.x,
-    //     enemy.position.y,
-    //     5,
-    //     200   
-    //    )
-    //    c.fillRect (
-    //     player.position.x,
-    //     player.position.y,
-    //     5,
-    //     200   
-    //    )
+//     // position x
+//     c.fillStyle = 'red'
+//     c.fillRect (
+//         enemy.position.x,
+//         enemy.position.y,
+//         5,
+//         200   
+//        )
+//        c.fillRect (
+//         player.position.x,
+//         player.position.y,
+//         5,
+//         200   
+//        )
 
-    // position x + width or - width   
+//     // position x + width or - width   
 //     c.fillStyle = 'blue'
 //     c.fillRect (
 //          enemy.position.x - 25,
@@ -250,7 +250,7 @@ function animate() {
 //          5,
 //          200   
 //         )
-        
+
     // Player movement
     player.velocity.x = 0 // reset the movement
 

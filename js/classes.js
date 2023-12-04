@@ -177,7 +177,11 @@ class Fighter extends Sprite {
         this.isAttacking = true
     }  
 
-    switchSprites(sprite) {
+    switchSprites(sprite) { 
+        if (this.direction === 'left') {
+            
+        }
+        
         if(this.image === this.sprites.death.image) {
             if(this.framesCurrent === this.sprites.death.framesMax - 1) {
                 this.dead = true
